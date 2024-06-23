@@ -2,7 +2,7 @@ version: '3.7'
 services:
   api:
     build:
-      context: ./api/
+      context: backend/
       dockerfile: Dockerfile
     ports:
       - "5005:5005"
