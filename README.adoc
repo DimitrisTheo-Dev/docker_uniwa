@@ -1,0 +1,18 @@
+= Virtual Lab
+
+This is a virtual lab project that uses Docker, React, and Node.js.
+
+== Services
+
+The project consists of two services:
+
+* `api`: This is a Node.js service that serves as the backend for the application.
+* `app`: This is a React application that serves as the frontend for the application.
+
+== Tools
+
+The following tools were used in this project:
+
+* Docker: Used to containerize the services.
+* React: Used to build the frontend of the application.
+* Node.js: Used to build the backend of the application.
