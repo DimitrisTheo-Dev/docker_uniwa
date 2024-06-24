@@ -1,18 +1,160 @@
-= Virtual Lab
+= Εργαστήριο Υπολογιστική Νέφους και Υπηρεσίες
+:toc:
+:toc-title: Πίνακας Περιεχομένων:
 
-This is a virtual lab project that uses Docker, React, and Node.js.
+[.text-center]
+ΆΣΚΗΣΗ 2024
 
-== Services
+Στο συγκεκριμένο project θα φτιάξουμε μια εφαρμογή που θα αποτελείται από 2 υπηρεσίες.
+Η πρώτη υπηρεσία θα είναι ένα Frontend που θα τρέχει σε React και η δεύτερη υπηρεσία θα είναι ένα Backend που θα τρέχει σε Node.
+Το Frontend θα επικοινωνεί με το Backend μέσω HTTP requests.
 
-The project consists of two services:
+Μαρία Δεμέστιχα - 20390055
 
-* `api`: This is a Node.js service that serves as the backend for the application.
-* `app`: This is a React application that serves as the frontend for the application.
+Δημήτρης Θεοδωρόπουλος – 20390073
 
-== Tools
 
-The following tools were used in this project:
+=== Εγκατάσταση
 
-* Docker: Used to containerize the services.
-* React: Used to build the frontend of the application.
-* Node.js: Used to build the backend of the application.
+Για την Εγκατάσταση της εφαρμογής ακολουθήστε τα παρακάτω βήματα
+
+Πρώτα κάνουμε clone το repository μας:
+
+git clone git@github.com:DimitrisTheo-Dev/docker_uniwa.git
+
+Και στην συνέχεια κάνουμε build και deploy τρέχοντας:
+
+```
+docker-compose build && docker-compose up
+```
+
+== Δημιουργία εικονικού εργαστηρίου
+
+
+Το εικονικό μας εργαστήριο περιλαμβάνει δύο υπηρεσίες οι οποίες εκτελούνται σε ένα κοινό δίκτυο, όπως ορίζεται στο αρχείο *docker-compose.yml* για κάθε υπηρεσία.
+
+```
+networks:
+  vlab:
+```
+
+=== Χώρος αποθήκευσης
+
+Στο virtual lab έχουμε δημιουργήσει έναν κοινό χώρο αποθήκευσης για και τις δύο υπηρεσίες.
+Αυτή την ρύθμιση μπορούμε να την βρούμε στο αρχείο *docker-compose.yml*.
+
+```
+volumes:
+  vlab_volume:
+```
+
+=== Εκτέλεση των υπηρεσιών
+
+docker-compose.yml
+
+```
+version: '3.7'
+services:
+  api:
+    build:
+      context: backend/
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    networks:
+      - vlab_network
+    volumes:
+      - ./vlab_network:/shared
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+  app:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - vlab_network
+    volumes:
+      - ./vlab_network:/shared
+    depends_on:
+      - api
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+networks:
+  vlab_network:
+
+volumes:
+  vlab_volume:
+```
+
+**
+script.sh
+**
+
+#!/bin/zsh
+
+build_services() {
+    printf "Initializing and launching Docker services...\n"
+    docker-compose build
+    # Check if the docker-compose command was successful
+    if [ $? -eq 0 ]; then
+        printf "Docker services launched successfully.\n"
+    else
+        printf "Error: Unable to launch Docker services.\n"
+        exit 1
+    fi
+}
+
+launch_services() {
+    printf "Launching Docker services...\n"
+    docker-compose up
+    if [ $? -eq 0 ]; then
+        printf "Docker services launched successfully.\n"
+    else
+        printf "Error: Unable to launch Docker services.\n"
+        exit 1
+    fi
+}
+
+terminate_services() {
+    printf "Terminating Docker services...\n"
+    docker-compose down
+    if [ $? -eq 0 ]; then
+        printf "Docker services terminated successfully.\n"
+    else
+        printf "Error: Unable to terminate Docker services.\n"
+        exit 1
+    fi
+}
+
+display_option() {
+    printf "Options: {launch|reload|terminate}\n"
+    exit 1
+}
+
+verify_docker_installation
+
+case "$1" in
+    launch)
+      build_services
+      launch_services
+      ;;
+    reload)
+        terminate_services
+        build_services
+        launch_services
+        ;;
+    terminate) terminate_services ;;
+    *)         display_option ;;
+esac
+
+
+Οι επιλογές που έχουμε είναι launch, reload και terminate.
+
+

@@ -1,0 +1,190 @@
+= Οδηγίες Δημιουργίας Εικονικού Εργαστηρίου
+:toc:
+
+== Εισαγωγή
+
+Αυτές οι οδηγίες περιγράφουν τα βήματα για τη δημιουργία ενός εικονικού εργαστηρίου χρησιμοποιώντας Docker Swarm, React και Node.js.
+
+== Περιγραφή
+
+Το εικονικό εργαστήριο περιλαμβάνει μια εφαρμογή React για το frontend και μια υπηρεσία Node.js για το backend, οι οποίες τρέχουν σε Docker containers και επικοινωνούν μέσω ενός κοινόχρηστου δικτύου και όγκου (volume).
+
+== Εγκατάσταση
+
+== Ενότητα Πρώτη
+
+=== Δημιουργία Δικτύου
+
+Για να δημιουργήσετε το δίκτυο για το εικονικό εργαστήριο, χρησιμοποιήστε την παρακάτω εντολή:
+
+```bash
+docker network create vlab_network
+```
+=== Αυτόματη Εγκατάσταση Προγράμματος για την Συλλογή των Δεδομένων
+
+Για να εκτελέσετε την αυτόματη εγκατάσταση της υπηρεσίας συλλογής δεδομένων, χρησιμοποιήστε το docker-compose.yml:
+```
+version: '3.7'
+services:
+  api:
+    build:
+      context: backend/
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    networks:
+      - vlab_network
+    volumes:
+      - shared_volume:/usr/src/app/shared
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+  app:
+    build:
+      context: ./ui/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - vlab_network
+    volumes:
+      - shared_volume:/usr/src/app/shared
+    depends_on:
+      - api
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+networks:
+  vlab_network:
+
+volumes:
+    shared_volume:
+```
+
+=== onEvent - Τοπική/Προσωρινή Αποθήκευση των Δεδομένων
+
+Η τοπική αποθήκευση των δεδομένων πραγματοποιείται μέσω του κοινόχρηστου όγκου (shared volume).
+
+== Ενότητα Τρίτη
+
+=== Δημιουργία GUI
+
+Η εφαρμογή React αποτελεί το GUI της εικονικής εργαστηρίου.
+
+=== Δημιουργία Websocket Σύνδεσης με την Βάση ή με τις Βασικές Υπηρεσίες για Άμεση Μεταφορά των Δεδομένων
+
+Η Websocket σύνδεση μπορεί να υλοποιηθεί στην υπηρεσία Node.js για άμεση μεταφορά δεδομένων μεταξύ του frontend και του backend.
+
+== Κώδικας
+```
+import React, { useEffect, useState } from "react";
+import './App.css';
+
+export default function App() {
+    const [data, setData] = useState(null);
+
+    useEffect(() => {
+        fetch('http://localhost:5005/')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => setData({ message: data }))
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, []);
+
+    return (
+        <div className="app-container">
+            <header className="app-header">
+                <h1>Welcome to Our Website</h1>
+            </header>
+            <main className="app-main">
+                <p>{!data ? "Loading..." : data.message}</p>
+            </main>
+        </div>
+    );
+}
+
+
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+
+app.use(cors({
+    origin: 'http://localhost:3000'
+}));
+
+app.use(express.json());
+
+app.get("/", (req, res) => {
+    res.send("Hello from the backend.");
+});
+
+const PORT = 5005;
+app.listen(PORT, () => {
+    console.log(`Server is running on PORT: ${PORT}`);
+});
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+CMD [ "npm", "start" ]
+
+Με αυτές τις οδηγίες, μπορείτε να δημιουργήσετε και να παραμετροποιήσετε το εικονικό σας εργαστήριο, διασφαλίζοντας τη σωστή λειτουργία των υπηρεσιών και την αποθήκευση των δεδομένων.
+version: '3.7'
+services:
+  api:
+    build:
+      context: backend/
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    networks:
+      - vlab_network
+    volumes:
+      - shared_volume:/usr/src/app/shared
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+  app:
+    build:
+      context: ./ui/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - vlab_network
+    volumes:
+      - shared_volume:/usr/src/app/shared
+    depends_on:
+      - api
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+networks:
+  vlab_network:
+
+volumes:
+    shared_volume:
+
+```

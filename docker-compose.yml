@@ -9,21 +9,21 @@ services:
     networks:
       - vlab_network
     volumes:
-      - shared_volume:/usr/src/app/shared
+      - ./vlab_network:/shared
     deploy:
       resources:
         limits:
           memory: 512M
   app:
     build:
-      context: ./ui/
+      context: frontend/
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     networks:
       - vlab_network
     volumes:
-      - shared_volume:/usr/src/app/shared
+      - ./vlab_network:/shared
     depends_on:
       - api
     deploy:
@@ -35,4 +35,4 @@ networks:
   vlab_network:
 
 volumes:
-    shared_volume:
+  vlab_volume:

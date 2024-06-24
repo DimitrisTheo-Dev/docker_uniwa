@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
+import { ReactComponent as Wave } from  './wave.svg'  ;
 
 export default function App() {
     const [data, setData] = useState(null);
@@ -23,6 +24,7 @@ export default function App() {
             <header className="app-header">
                 <h1>Welcome to Our Website</h1>
             </header>
+            <Wave />
             <main className="app-main">
                 <p>{!data ? "Loading..." : data.message}</p>
             </main>
