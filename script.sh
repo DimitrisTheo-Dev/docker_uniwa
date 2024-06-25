@@ -1,13 +1,13 @@
 #!/bin/zsh
 
 build_services() {
-    printf "Initializing and launching Docker services...\n"
+    printf "Building Docker services...\n"
     docker-compose build
     # Check if the docker-compose command was successful
     if [ $? -eq 0 ]; then
-        printf "Docker services launched successfully.\n"
+        printf "Docker services have been build successful.\n"
     else
-        printf "Error: Unable to launch Docker services.\n"
+        printf "Error: Unable to build Docker services.\n"
         exit 1
     fi
 }
@@ -36,7 +36,7 @@ terminate_services() {
 
 
 display_option() {
-    printf "Options: {launch|reload|terminate}\n"
+    printf "Options:\n 1. launch \n 2. reload \n 3.terminate\n"
     exit 1
 }
 

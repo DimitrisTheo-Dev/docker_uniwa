@@ -13,7 +13,6 @@ app.get("/", (req, res) => {
     res.send("Hello from the backend.");
 });
 
-
 // Start server
 const PORT = 5005;
 app.listen(PORT, () => {
