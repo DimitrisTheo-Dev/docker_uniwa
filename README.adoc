@@ -20,12 +20,20 @@
 
 Πρώτα κάνουμε clone το repository μας:
 
+```
 git clone git@github.com:DimitrisTheo-Dev/docker_uniwa.git
+cd <directory>
+```
 
 Και στην συνέχεια κάνουμε build και deploy τρέχοντας:
 
 ```
 docker-compose build && docker-compose up
+```
+Εναλλακτικά τρέχουμε το script.sh με την εντολή
+
+```
+./script launch
 ```
 
 == Δημιουργία εικονικού εργαστηρίου
