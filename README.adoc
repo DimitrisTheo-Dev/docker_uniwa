@@ -97,6 +97,7 @@ volumes:
 script.sh
 **
 
+```
 #!/bin/zsh
 
 build_services() {
@@ -154,7 +155,7 @@ case "$1" in
     *)         display_option ;;
 esac
 
-
+```
 Οι επιλογές που έχουμε είναι launch, reload και terminate.
 
 
