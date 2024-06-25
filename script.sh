@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 build_services() {
     printf "Building Docker services...\n"
